@@ -53,6 +53,7 @@ jobs:
           sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
           sudo apt update
           sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          sudo rm -r first-ec2-nginx
           git clone https://github.com/bbbayhan/first-ec2-nginx.git
           cd first-ec2-nginx
           git pull origin main
