@@ -36,11 +36,27 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > key.pem
           chmod 400 key.pem
 
-      - name: Deploy to EC2
+      - name: Deploy to EC2 and run the container
         run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          sudo apt update
+          sudo apt upgrade -y
+          sudo apt install -y ca-certificates curl gnupg lsb-release
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+          sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+          "deb [arch=$(dpkg --print-architecture) \
+          signed-by=/etc/apt/keyrings/docker.gpg] \
+          https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | \
+          sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt update
+          sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
           cd ${{ secrets.EC2_PROJECT_PATH }}
           git pull origin main
-          sudo mv index.html ${{ secrets.NGINX_PATH }}
+          sudo docker compose up --build -d
           echo "✅ Deployment complete!"
           EOF
+
+  
