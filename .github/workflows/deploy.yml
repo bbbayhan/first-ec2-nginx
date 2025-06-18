@@ -56,7 +56,7 @@ jobs:
           git clone https://github.com/bbbayhan/first-ec2-nginx.git
           cd first-ec2-nginx
           git pull origin main
-          sudo docker kill $(docker ps -q)
+          sudo docker ps -q | xargs -r docker kill
           sudo docker system prune -a --volumes -f
           sudo docker compose up -d
           echo "✅ Deployment complete!"
